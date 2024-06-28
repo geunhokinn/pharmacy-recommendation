@@ -11,6 +11,11 @@ class PharmacyRepositoryTest extends AbstractIntegrationContainerBaseTest {
     @Autowired
     private PharmacyRepository pharmacyRepository;
 
+    // 모든 테스트 메서드 시작 전에 DB 초기화
+    def setup() {
+        pharmacyRepository.deleteAll()
+    }
+
     // 약국 엔티티 저장 테스트
     def "PharmacyRepository save"() {
         given:
@@ -38,5 +43,30 @@ class PharmacyRepositoryTest extends AbstractIntegrationContainerBaseTest {
         result.getPharmacyName() == name
         result.getLatitude() == latitude
         result.getLongitude() == longitude
+    }
+
+    // 약국 엔티티 저장 테스트 2
+    def "PharmacyRepository saveAll"() {
+        given:
+        String address = "서울 특별시 성북구 종암동"
+        String name = "은혜 약국"
+        double latitude = 36.11
+        double longitude = 128.11
+
+        // 약국 엔티티 생성
+
+        def pharmacy = Pharmacy.builder()
+                .pharmacyAddress(address)
+                .pharmacyName(name)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build()
+
+        when:
+        pharmacyRepository.saveAll(Arrays.asList(pharmacy))
+        def result = pharmacyRepository.findAll()
+
+        then:
+        result.size() == 1
     }
 }
