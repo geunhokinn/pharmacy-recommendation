@@ -69,4 +69,30 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
         // 약국 엔티티 주소가 기존 주소랑 같은지 검증
         result.get(0).pharmacyAddress == inputAddress
     }
+
+    // self invocation test
+    def "self invocation"() {
+        given:
+        String address = "서울 특별시 성북구 종암동"
+        String name = "은혜 약국"
+        double latitude = 36.11
+        double longitude = 128.11
+
+        def pharmacy = Pharmacy.builder()
+                .pharmacyAddress(address)
+                .pharmacyName(name)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build()
+
+        when:
+        pharmacyRepositoryService.bar(Arrays.asList(pharmacy))
+
+        then:
+        // spock 에서 제공하는 예외 처리를 할 수 있는 키워드 thrown
+        // when 블록에서 발생하는 예외를 잡는다.
+        def e = thrown(RuntimeException.class)
+        def result = pharmacyRepositoryService.findAll()
+        result.size() == 1 // 트랜잭션이 적용되지 않는다(rollback 적용 x)
+    }
 }
