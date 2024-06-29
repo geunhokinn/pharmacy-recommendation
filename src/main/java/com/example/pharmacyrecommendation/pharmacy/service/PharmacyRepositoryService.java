@@ -42,7 +42,7 @@ public class PharmacyRepositoryService {
         Pharmacy entity = pharmacyRepository.findById(id).orElse(null);
 
         // 엔티티가 null 이면 return
-        if(Objects.isNull(entity)) {
+        if (Objects.isNull(entity)) {
             log.error("[PharmacyRepositoryService updateAddress] not found id: {}", id);
         }
 
@@ -55,10 +55,16 @@ public class PharmacyRepositoryService {
         Pharmacy entity = pharmacyRepository.findById(id).orElse(null);
 
         // 엔티티가 null 이면 return
-        if(Objects.isNull(entity)) {
+        if (Objects.isNull(entity)) {
             log.error("[PharmacyRepositoryService updateAddress] not found id: {}", id);
         }
 
         entity.changePharmacyAddress(address);
+    }
+
+    // 고객이 주소를 입력했을 때 가까운 약국을 찾기 위한 메서드
+    @Transactional(readOnly = true)
+    public List<Pharmacy> findAll() {
+        return pharmacyRepository.findAll();
     }
 }
