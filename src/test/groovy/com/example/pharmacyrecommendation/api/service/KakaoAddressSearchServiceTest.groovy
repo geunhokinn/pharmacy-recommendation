@@ -36,4 +36,37 @@ class KakaoAddressSearchServiceTest extends AbstractIntegrationContainerBaseTest
         // 최소한 한 개는 있어야 됨
         result.documentDtoList.get(0).addressName != null
     }
+
+    // 다양한 주소 검색에 대한 테스트
+    def "정상적인 주소를 입력했을 경우, 정상적인 위도, 경로로 변환된다."() {
+
+        given:
+        // 실제 결과 값을 false 로 미리 지정
+        boolean actualResult = false
+
+        when:
+        // 카카오 주소 검색 api 를 호출한 결과값
+        def searchResult = kakaoAddressSearchService.requestAddressSearch(inputAddress)
+
+        then:
+        // 결과값이 null 이면 false
+        // 정상적으로 결과 값이 있으면 documentDtoList 의 사이즈가 0 보다 크므로 true
+        if (searchResult == null) actualResult = false
+        else actualResult = searchResult.getDocumentDtoList().size() > 0
+
+        // 실제 값과 기대 값이 같은지 검증
+        actualResult == expectedResult
+
+        where:
+        // where 블록에서 사용할 파라미터를 정의하고 기대되는 결과 값을 적을 수 있음
+        // data table
+        inputAddress    |   expectedResult
+        "서울 특별시 성북구 종암동"                   | true
+        "서울 성북구 종암동 91"                     | true
+        "서울 대학로"                             | true
+        "서울 성북구 종암동 잘못된 주소"               | false // 잘못된 주소이므로 결과값이 null
+        "광진구 구의동 251-45"                     | true
+        "광진구 구의동 251-455555"                 | false // 잘못된 주소이므로 결과값이 null
+        ""                                      | false // empty value 이므로 결과값이 null
+    }
 }
