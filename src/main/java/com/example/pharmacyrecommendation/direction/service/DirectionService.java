@@ -2,10 +2,13 @@ package com.example.pharmacyrecommendation.direction.service;
 
 import com.example.pharmacyrecommendation.api.dto.DocumentDto;
 import com.example.pharmacyrecommendation.direction.entity.Direction;
+import com.example.pharmacyrecommendation.direction.repository.DirectionRepository;
 import com.example.pharmacyrecommendation.pharmacy.dto.PharmacyDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +28,20 @@ public class DirectionService {
 
     // 약국 데이터를 조회하고 dto 로 반환하는 메서드를 사용하기 위해 의존성 주입
     private final PharmacySearchService pharmacySearchService;
+
+    // 약국 안내(추천) 결과를 저장하는 메서드를 사용하기 위해 의존성 주입
+    private final DirectionRepository directionRepository;
+
+    // 약국 안내(추천) 결과를 저장하는 메서드
+    @Transactional
+    public List<Direction> saveAll(List<Direction> directionList) {
+
+        // directionList 가 null 이면 빈 리스트 반환
+        if(CollectionUtils.isEmpty(directionList)) return Collections.emptyList();
+
+        // 약국 안내(추천) 결과 저장
+        return directionRepository.saveAll(directionList);
+    }
 
     // 고객에게 최대 3개의 약국을 안내(추천)하는 메서드, documentDto - 고객이 입력한 주소 정보
     public List<Direction> buildDirectionList(DocumentDto documentDto) {
