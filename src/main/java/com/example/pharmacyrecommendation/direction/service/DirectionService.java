@@ -3,7 +3,7 @@ package com.example.pharmacyrecommendation.direction.service;
 import com.example.pharmacyrecommendation.api.dto.DocumentDto;
 import com.example.pharmacyrecommendation.direction.entity.Direction;
 import com.example.pharmacyrecommendation.direction.repository.DirectionRepository;
-import com.example.pharmacyrecommendation.pharmacy.dto.PharmacyDto;
+import com.example.pharmacyrecommendation.pharmacy.service.PharmacySearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

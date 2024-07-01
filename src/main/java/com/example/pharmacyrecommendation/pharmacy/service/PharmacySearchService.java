@@ -1,4 +1,4 @@
-package com.example.pharmacyrecommendation.direction.service;
+package com.example.pharmacyrecommendation.pharmacy.service;
 
 import com.example.pharmacyrecommendation.pharmacy.dto.PharmacyDto;
 import com.example.pharmacyrecommendation.pharmacy.entity.Pharmacy;
