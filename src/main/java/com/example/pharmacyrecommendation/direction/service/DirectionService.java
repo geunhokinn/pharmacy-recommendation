@@ -1,6 +1,7 @@
 package com.example.pharmacyrecommendation.direction.service;
 
 import com.example.pharmacyrecommendation.api.dto.DocumentDto;
+import com.example.pharmacyrecommendation.api.service.KakaoCategorySearchService;
 import com.example.pharmacyrecommendation.direction.entity.Direction;
 import com.example.pharmacyrecommendation.direction.repository.DirectionRepository;
 import com.example.pharmacyrecommendation.pharmacy.service.PharmacySearchService;
@@ -28,9 +29,10 @@ public class DirectionService {
 
     // 약국 데이터를 조회하고 dto 로 반환하는 메서드를 사용하기 위해 의존성 주입
     private final PharmacySearchService pharmacySearchService;
-
     // 약국 안내(추천) 결과를 저장하는 메서드를 사용하기 위해 의존성 주입
     private final DirectionRepository directionRepository;
+    // 카테고리로 장소 검색 api 요청 메서드를 호출하기 위해 의존성 주입
+    private final KakaoCategorySearchService kakaoCategorySearchService;
 
     // 약국 안내(추천) 결과를 저장하는 메서드
     @Transactional
@@ -66,6 +68,28 @@ public class DirectionService {
                                 .build()) // dto list 를 스트림으로 변환해서 Direction 엔티티로 만들기
                 .filter(direction -> direction.getDistance() <= RADIUS_KM) // 반경 10km 이내인 Direction 엔티티만 필터
                 .sorted(Comparator.comparing(Direction::getDistance)) // 거리로 오름차순 정렬
+                .limit(MAX_SEARCH_COUNT) // 최대 3개로 제한
+                .collect(Collectors.toList()); // 리스트로 변환
+    }
+
+    // 공공 기관 데이터를 사용하는 것이 아닌 카테고리로 장소 검색 api 로 데이터를 찾고 최대 3개의 약국을 안내(추천)하는 메서드
+    public List<Direction> buildDirectionListByCategoryApi(DocumentDto inputDocumentDto) {
+        if(Objects.isNull(inputDocumentDto)) return Collections.emptyList();
+
+        return kakaoCategorySearchService
+                .requestPharmacyCategorySearch(inputDocumentDto.getLatitude(), inputDocumentDto.getLongitude(), RADIUS_KM)
+                .getDocumentDtoList() // 가까운 약국 리스트
+                .stream().map(resultDocumentDto ->
+                        Direction.builder()
+                                .inputAddress(inputDocumentDto.getAddressName()) // 고객 주소 이름
+                                .inputLatitude(inputDocumentDto.getLatitude()) // 고객 위도
+                                .inputLongitude(inputDocumentDto.getLongitude()) // 고객 경도
+                                .targetPharmacyName(resultDocumentDto.getPlaceName()) // 약국 이름
+                                .targetAddress(resultDocumentDto.getAddressName()) // 약국 주소 이름
+                                .targetLatitude(resultDocumentDto.getLatitude()) // 약국 위도
+                                .targetLongitude(resultDocumentDto.getLongitude()) // 약국 경도
+                                .distance(resultDocumentDto.getDistance() * 0.001) // m -> km 단위로 변환
+                                .build())
                 .limit(MAX_SEARCH_COUNT) // 최대 3개로 제한
                 .collect(Collectors.toList()); // 리스트로 변환
     }
