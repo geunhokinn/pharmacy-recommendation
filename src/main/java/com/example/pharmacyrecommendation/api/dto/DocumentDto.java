@@ -18,6 +18,6 @@ public class DocumentDto {
     @JsonProperty("y")
     private double latitude; // 위도
 
-    @JsonProperty("X")
+    @JsonProperty("x")
     private double longitude; // 경도
 }
