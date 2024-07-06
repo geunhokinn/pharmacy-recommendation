@@ -1,6 +1,8 @@
 package com.example.pharmacyrecommendation.direction.service
 
 import com.example.pharmacyrecommendation.api.dto.DocumentDto
+import com.example.pharmacyrecommendation.api.service.KakaoCategorySearchService
+import com.example.pharmacyrecommendation.direction.repository.DirectionRepository
 import com.example.pharmacyrecommendation.pharmacy.dto.PharmacyDto
 import com.example.pharmacyrecommendation.pharmacy.service.PharmacySearchService
 import spock.lang.Specification
@@ -9,9 +11,13 @@ class DirectionServiceTest extends Specification {
 
     // spock 에서 Mock() 을 이용해서 목 객체 생성
     private PharmacySearchService pharmacySearchService = Mock()
+    private DirectionRepository directionRepository = Mock()
+    private KakaoCategorySearchService kakaoCategorySearchService = Mock()
+    private Base62Service base62Service = Mock()
 
     // DirectionService 테스트
-    private DirectionService directionService = new DirectionService(pharmacySearchService)
+    private DirectionService directionService = new DirectionService(
+            pharmacySearchService, directionRepository, kakaoCategorySearchService, base62Service)
 
     // 샘플 약국 데이터 리스트
     private List<PharmacyDto> pharmacyList
