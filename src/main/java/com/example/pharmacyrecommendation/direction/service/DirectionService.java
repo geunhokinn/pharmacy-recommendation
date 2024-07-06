@@ -33,6 +33,8 @@ public class DirectionService {
     private final DirectionRepository directionRepository;
     // 카테고리로 장소 검색 api 요청 메서드를 호출하기 위해 의존성 주입
     private final KakaoCategorySearchService kakaoCategorySearchService;
+    // pk 를 인코딩과 디코딩하는 메서드를 호출하기 위해 의존성 주입
+    private final Base62Service base62Service;
 
     // 약국 안내(추천) 결과를 저장하는 메서드
     @Transactional
@@ -43,6 +45,12 @@ public class DirectionService {
 
         // 약국 안내(추천) 결과 저장
         return directionRepository.saveAll(directionList);
+    }
+
+    // 인코딩된 pk 가 입력되면 pk 를 디코딩해서 엔티티를 조회하는 메서드
+    public Direction findById(String encodedId) {
+        Long decodedId = base62Service.decodeDirectionId(encodedId);
+        return directionRepository.findById(decodedId).orElse(null);
     }
 
     // 고객에게 최대 3개의 약국을 안내(추천)하는 메서드, documentDto - 고객이 입력한 주소 정보
