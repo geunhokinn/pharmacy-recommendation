@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +27,8 @@ public class DirectionService {
     private static final int MAX_SEARCH_COUNT = 3;
     // 반경 10 km
     private static final double RADIUS_KM = 10.0;
+    // 길 안내 url
+    private static final String DIRECTION_BASE_URL = "https://map.kakao.com/link/map/";
 
     // 약국 데이터를 조회하고 dto 로 반환하는 메서드를 사용하기 위해 의존성 주입
     private final PharmacySearchService pharmacySearchService;
@@ -48,9 +51,19 @@ public class DirectionService {
     }
 
     // 인코딩된 pk 가 입력되면 pk 를 디코딩해서 엔티티를 조회하는 메서드
-    public Direction findById(String encodedId) {
+    public String findDirectionUrlById(String encodedId) {
         Long decodedId = base62Service.decodeDirectionId(encodedId);
-        return directionRepository.findById(decodedId).orElse(null);
+        Direction direction = directionRepository.findById(decodedId).orElse(null);
+
+        // 길 안내 파라미터 생성
+        String params = String.join(",", direction.getTargetPharmacyName(),
+                String.valueOf(direction.getTargetLatitude()), String.valueOf(direction.getTargetLongitude()));
+
+        // UriComponentsBuilder 객체를 String 으로 변환하며 자동으로 인코딩
+        String result = UriComponentsBuilder.fromHttpUrl(DIRECTION_BASE_URL + params)
+                .toUriString();
+
+        return result;
     }
 
     // 고객에게 최대 3개의 약국을 안내(추천)하는 메서드, documentDto - 고객이 입력한 주소 정보
