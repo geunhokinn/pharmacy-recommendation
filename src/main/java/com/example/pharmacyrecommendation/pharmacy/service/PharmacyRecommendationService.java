@@ -5,12 +5,13 @@ import com.example.pharmacyrecommendation.api.dto.KakaoApiResponseDto;
 import com.example.pharmacyrecommendation.api.service.KakaoAddressSearchService;
 import com.example.pharmacyrecommendation.direction.dto.OutputDto;
 import com.example.pharmacyrecommendation.direction.entity.Direction;
+import com.example.pharmacyrecommendation.direction.service.Base62Service;
 import com.example.pharmacyrecommendation.direction.service.DirectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,11 +26,14 @@ public class PharmacyRecommendationService {
 
     private final KakaoAddressSearchService kakaoAddressSearchService;
     private final DirectionService directionService;
+    private final Base62Service base62Service;
+
+    // 환경 변수에 있는 baseUrl 을 가져오기
+    @Value("${pharmacy.recommendation.base.url}")
+    private String baseUrl;
 
     // 로드 뷰 url
     private static final String ROAD_VIEW_BASE_URL = "https://map.kakao.com/link/roadview/";
-    // 길 안내 url
-    private static final String DIRECTION_BASE_URL = "https://map.kakao.com/link/map/";
 
     // 최종적으로 가까운 약국을 찾고 약국 안내(추천)를 저장하는 메서드
     public List<OutputDto> recommendPharmacyList(String address) {
@@ -61,20 +65,10 @@ public class PharmacyRecommendationService {
     // 엔티티를 dto 로 변환하는 메서드
     private OutputDto convertToOutputDto(Direction direction) {
 
-        // 길 안내 파라미터 생성
-        String params = String.join(",", direction.getTargetPharmacyName(),
-                String.valueOf(direction.getTargetLatitude()), String.valueOf(direction.getTargetLongitude()));
-
-        // UriComponentsBuilder 객체를 String 으로 변환하며 자동으로 인코딩
-        String result = UriComponentsBuilder.fromHttpUrl(DIRECTION_BASE_URL + params)
-                .toUriString();
-
-        log.info("direction params: {}, url: {}", params, result);
-
         return OutputDto.builder()
                 .pharmacyName(direction.getTargetPharmacyName())
                 .pharmacyAddress(direction.getTargetAddress())
-                .directionUrl(result)
+                .directionUrl(baseUrl + base62Service.encodeDirectionId(direction.getId()))
                 .roadViewUrl(ROAD_VIEW_BASE_URL + direction.getTargetLatitude() + "," + direction.getTargetLongitude())
                 .distance(String.format("%.2f km", direction.getDistance()))
                 .build();
