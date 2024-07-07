@@ -51,9 +51,9 @@ public class PharmacyRecommendationService {
         DocumentDto documentDto = kakaoApiResponseDto.getDocumentDtoList().get(0);
 
         // 가까운 약국 리스트를 찾기
-//        List<Direction> directionList = directionService.buildDirectionList(documentDto);
+        List<Direction> directionList = directionService.buildDirectionList(documentDto);
         // 공공기관 데이터와 거리 계산 알고리즘을 사용하지 않고 api 를 통해서 약국을 안내(추천)
-        List<Direction> directionList = directionService.buildDirectionListByCategoryApi(documentDto);
+//        List<Direction> directionList = directionService.buildDirectionListByCategoryApi(documentDto);
 
         // 찾은 약국 리스트를 데이터 베이스에 저장하고 컨트롤러에 dto 로 반환
         return directionService.saveAll(directionList)
