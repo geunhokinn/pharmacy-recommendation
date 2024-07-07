@@ -24,8 +24,8 @@ abstract class AbstractIntegrationContainerBaseTest extends Specification {
 
         // spring boot 는 redis 와 통신을 하기 위해 mapping 된 host 와 port 를 알아야 한다.
         // 랜덤한 host port 를 spring boot 에게 알려주기
-        System.setProperty("spring.redis.host", MY_REDIS_CONTAINER.getHost())
+        System.setProperty("spring.data.redis.host", MY_REDIS_CONTAINER.getHost())
         // docker port 6379와 mapping 된 port 를 spring boot 에게 알려주기, string 값이 들어가야 됨
-        System.setProperty("spring.redis.port", MY_REDIS_CONTAINER.getMappedPort(6379).toString())
+        System.setProperty("spring.data.redis.port", MY_REDIS_CONTAINER.getMappedPort(6379).toString())
     }
 }
