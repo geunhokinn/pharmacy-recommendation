@@ -28,7 +28,7 @@ services:
     depends_on:
       - pharmacy-recommendation-database
       - pharmacy-recommendation-redis
-    image: zcx5674/pharmacy-recommendation-app
+    image: geunhokinn/pharmacy-recommendation-app
     environment:
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
